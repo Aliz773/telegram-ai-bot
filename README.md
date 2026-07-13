@@ -20,7 +20,7 @@
 
 Cloudflare یه دکمه‌ی رسمی داره که همه‌چیز رو با چندتا کلیک انجام میده — لاگین با گیت‌هاب و کلادفلر (بدون نیاز به کپی‌کردن توکن جایی)، ساخت خودکار KV، و دیپلوی. این دقیقاً همون تجربه‌ی «پنل نصب» ایه که می‌خواستی، منتها میزبانش خود Cloudflareست، نه یه سرور واسط:
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=<لینک_ریپازیتوری_گیت‌هاب_خودت_رو_اینجا_بذار>)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=<[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Aliz773/telegram-ai-bot)>)
 
 **مراحل:**
 1. اول این پروژه رو (همون‌طور که خودت گفته بودی) تو یه ریپازیتوری گیت‌هاب آپلود کن.
