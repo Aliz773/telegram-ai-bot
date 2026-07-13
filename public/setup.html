@@ -1,1 +1,156 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>تنظیمات API</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Tahoma, Vazirmatn, sans-serif;
+    background: linear-gradient(160deg, #2b1a4a, #4a2f6b 60%, #23163a);
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+    color: #eee;
+  }
+  .card {
+    max-width: 420px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px;
+    padding: 24px 20px;
+    backdrop-filter: blur(10px);
+  }
+  h1 { font-size: 20px; text-align: center; margin-bottom: 8px; }
+  .section-title {
+    font-size: 13px;
+    color: #a996e0;
+    margin: 26px 0 4px;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    padding-top: 18px;
+  }
+  label { display: block; font-size: 14px; margin: 14px 0 6px; color: #cfc7e6; }
+  input, select, textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.25);
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    font-family: inherit;
+  }
+  textarea { resize: vertical; min-height: 70px; }
+  input:focus, select:focus, textarea:focus { border-color: #8a6fd8; }
+  .hint { font-size: 12px; color: #9d92bd; margin-top: 4px; }
+  button {
+    width: 100%;
+    margin-top: 26px;
+    padding: 14px;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(90deg, #6a5acd, #8a4fd8);
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.6; }
+  #status { margin-top: 14px; text-align: center; font-size: 14px; min-height: 20px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>⚙️ تنظیمات API</h1>
 
+    <label>رمز ورود به تنظیمات 🔒</label>
+    <input id="setupPassword" type="password" placeholder="رمزی که موقع deploy ست کردی" />
+
+    <div class="section-title">اتصال</div>
+
+    <label>Telegram Bot Token 🤖</label>
+    <input id="botToken" type="text" placeholder="123456:ABC-..." />
+
+    <label>API Key 🔑</label>
+    <input id="apiKey" type="text" placeholder="sk-..." />
+
+    <label>Base URL 🌐</label>
+    <input id="baseUrl" type="text" placeholder="https://api.example.com/v1" />
+
+    <label>مدل پیش‌فرض</label>
+    <input id="model" type="text" placeholder="gpt-4o-mini" />
+
+    <label>Bot Username 🤖</label>
+    <input id="botUsername" type="text" placeholder="my_ai_bot" />
+
+    <label>کلمه‌ی فراخوانی در گروه 💬</label>
+    <input id="triggerWord" type="text" placeholder="مثلاً: حاجی" />
+    <div class="hint">اگه خالی بمونه، بات تو گروه هیچ‌وقت جواب نمیده.</div>
+
+    <div class="section-title">تنظیمات پاسخ</div>
+
+    <label>حداکثر طول پاسخ (Max Tokens)</label>
+    <input id="maxTokens" type="number" step="1" min="50" placeholder="800" />
+    <div class="hint">
+      شخصیت بات و میزان خلاقیت (temperature) دیگه از همین‌جا تنظیم نمیشن —
+      خود کاربر تو چت خصوصی بات با دستورهای <b>/persona</b> و <b>/temp</b> و <b>/settings</b> تنظیمشون می‌کنه.
+    </div>
+
+    <button id="saveBtn">💾 ذخیره تنظیمات</button>
+    <div id="status"></div>
+  </div>
+
+<script>
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('saveBtn');
+  const status = document.getElementById('status');
+  const payload = {
+    setupPassword: document.getElementById('setupPassword').value,
+    botToken: document.getElementById('botToken').value.trim(),
+    apiKey: document.getElementById('apiKey').value.trim(),
+    baseUrl: document.getElementById('baseUrl').value.trim(),
+    model: document.getElementById('model').value.trim(),
+    botUsername: document.getElementById('botUsername').value.trim(),
+    triggerWord: document.getElementById('triggerWord').value.trim(),
+    maxTokens: document.getElementById('maxTokens').value,
+  };
+
+  if (!payload.botToken || !payload.apiKey || !payload.baseUrl) {
+    status.textContent = 'توکن بات، API key و Base URL اجباریه';
+    status.style.color = '#ff8080';
+    return;
+  }
+
+  btn.disabled = true;
+  status.textContent = 'در حال ذخیره...';
+  status.style.color = '#cfc7e6';
+
+  try {
+    const res = await fetch('/api/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      status.textContent = '✅ ذخیره شد. حالا وبهوک رو ست کن: /api/set-webhook';
+      status.style.color = '#8fe38f';
+      document.getElementById('apiKey').value = '';
+      document.getElementById('botToken').value = '';
+    } else {
+      status.textContent = '❌ ' + (data.error || 'خطا در ذخیره');
+      status.style.color = '#ff8080';
+    }
+  } catch (e) {
+    status.textContent = '❌ خطا در اتصال به سرور';
+    status.style.color = '#ff8080';
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
